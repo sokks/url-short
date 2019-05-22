@@ -1,17 +1,25 @@
 package handlers
 
 import (
-	"fmt"
+	"encoding/json"
 	"log"
 	"net/http"
 
-	"gophersises/02_url_shortener/hasher"
-	"gophersises/02_url_shortener/storage"
+	"github.com/sokks/url-short/hasher"
+	"github.com/sokks/url-short/storage"
 
 	"github.com/gorilla/mux"
 )
 
-var maxRetries = 2
+var (
+	maxRetries = 2
+	baseURL = ""
+)
+
+func Init(newBaseURL string, maxRehash int) {
+	baseURL = newBaseURL
+	maxRetries = maxRehash
+}
 
 // IndexHandler handles url redirection
 func IndexHandler(w http.ResponseWriter, r *http.Request) {
@@ -21,7 +29,7 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 
 	fullURL, err := storage.Get(hash)
 	if err == storage.ErrKeyNotFound {
-		w.WriteHeader(http.StatusNotFound)
+		w.WriteHeader(http.StatusNotFound) // todo html page
 		return
 	} else if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -31,17 +39,21 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, fullURL, http.StatusFound)
 }
 
+type NewResponse struct {
+	Long  string `json:"long"`
+	Short string `json:"short"`
+}
+
 // NewHandler for short url creation
 func NewHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method == http.MethodGet {
-		w.Write(formTmpl)
+	longurl := r.FormValue("url")
+	log.Printf("[REQUEST] /new url=%s", longurl)
+	if longurl == "" {
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	longurl := r.FormValue("url")
-	fmt.Fprintln(w, "you enter: ", longurl)
-
-	hash := hasher.HashURL(longurl)
+	hash := hasher.HashURL(longurl, 0)
 
 	var err error
 	for i := 0; i < maxRetries; i++ {
@@ -50,34 +62,33 @@ func NewHandler(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 		if err == storage.ErrKeyAlreadyExists {
-			log.Printf("[COLLISION] url:%s hash:%s", longurl, hash)
-			hash = hasher.HashURL(longurl)
+			var existingURL string
+			existingURL, err = storage.Get(hash)  // лок же не нужен?
+			if err == nil && existingURL == longurl {
+				break
+			}
+			
+			log.Printf("[COLLISION] url=%s hash=%s", longurl, hash)
+			hash = hasher.HashURL(longurl, uint64(i+1))
 		} else {
 			log.Printf("[SET error] %s", err)
 		}
 	}
 	if err != nil {
+		log.Printf("[ERROR] cannot save url hash after %d tries url=%s hash=%s err=%s", maxRetries, longurl, hash, err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	fmt.Fprintln(w, "hash: ", hash)
+	resp := NewResponse{
+		Long:  longurl,
+		Short: baseURL+hash,
+	}
+	data, err := json.Marshal(resp)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	w.Write(data)
 }
 
-var formTmpl = []byte(`
-<html>
-<head profile="http://www.w3.org/2005/10/profile">
-<link rel="icon" 
-      type="image/png" 
-      href="/static/img/favicon.png" />
-</head>
-	<body>
-	<form action="/new" method="post" name="urlform">
-		url: <input type="text" name="url">
-		<input type="submit" value="Shorten!">
-	</form>
-	</body>
-</html>
-`)
-
-// todo big form

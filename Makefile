@@ -1,16 +1,30 @@
 default:
 	echo hello
 
+prepare_static:
+	cp -r static/html/* /var/www/exler.xyz/html/
+	cp -r static/css/* /var/www/exler.xyz/css/
+	cp -r static/js/* /var/www/exler.xyz/js/
+	cp -r static/img/* /var/www/exler.xyz/img/
+
 build_app:
 	docker build -t urlshort .
 
+run_app_no_db:
+	docker stop urlshort || true && docker rm urlshort || true
+	docker run -it -d --env-file urlshort.env -p 127.0.0.1:12321:12321 --name urlshort urlshort
+
+stop:
+	docker stop urlshort || true && docker rm urlshort || true
+	docker stop some-redis || true && docker rm some-redis || true
+
 run_app:
 	docker stop urlshort || true && docker rm urlshort || true
-	docker run -it --env-file urlshort.env -p 12321:12321 --link some-redis:redis --name urlshort urlshort #--network=host 
+	docker run -it -d --env-file urlshort.env -p 127.0.0.1:12321:12321 --link some-redis:redis --name urlshort urlshort #--network=host 
 
 run_redis:
 	docker stop some-redis || true && docker container rm some-redis || true
-	docker run -p 6379:6379 -v redis_vol:/data --name some-redis -d redis
+	docker run -p 6379:6379 -v redis_vol:/data --name some-redis -d redis 
 	# -v /usr/local/etc/redis.conf:/usr/local/etc/redis/redis.conf
 
 create_volume:
@@ -20,3 +34,10 @@ create_volume:
       --opt o=bind \
       redis_vol
 
+connect_to_redis:
+	sudo docker run -it --name my-redis-cli --link some-redis:redis --rm redis redis-cli -h redis -p 6379
+
+create_vol_dirs:
+	# mkdir -p /var/log/urlshort
+	# mkdir -p /var/log/redis
+	mkdir -p /var/redis

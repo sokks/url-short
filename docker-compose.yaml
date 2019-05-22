@@ -1,0 +1,35 @@
+version: '3'
+services:
+  urlshort:
+    build: .
+    image: urlshort
+    ports:
+      - "127.0.0.1:12321:12321"
+    env_file:
+      - urlshort.env
+    container_name: urlshort
+    depends_on:
+      - "redis"
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1k"
+        max-file: "3"
+
+  redis:
+    image: redis
+    env_file:
+      - redis.env
+    volumes:
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
+      - /var/redis:/var/redis
+    ports:
+      - "127.0.0.1:6379:6379"
+    container_name: some-redis
+    command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1m"
+        max-file: "3"

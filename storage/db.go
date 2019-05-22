@@ -14,8 +14,8 @@ type DBStorage struct {
 func NewDBStorage(addr string, pwd string, db int, rwTimeout time.Duration) (*DBStorage, error) {
 	client := redis.NewClient(&redis.Options{
 		Addr:         addr,
-		Password:     pwd, // no password set
-		DB:           db,  // use default DB
+		Password:     pwd,
+		DB:           db,
 		ReadTimeout:  rwTimeout,
 		WriteTimeout: rwTimeout,
 	})

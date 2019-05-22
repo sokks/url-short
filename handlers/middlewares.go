@@ -23,19 +23,9 @@ func PanicMiddleware(next http.Handler) http.Handler {
 // RequestLoggingMiddleware writes each request into a slice
 func RequestLoggingMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log.Println("[requestLoggingMiddleware] ", r)
-
-		// exclude
-		// if strings.HasPrefix(r.RequestURI, "/simple-go-app/admin") ||
-		// 	strings.HasPrefix(r.RequestURI, "/simple-go-app/login") ||
-		// 	strings.HasPrefix(r.RequestURI, "/simple-go-app/register") ||
-		// 	strings.HasPrefix(r.RequestURI, "/simple-go-app/recover") {
-		// 	next.ServeHTTP(w, r)
-		// 	return
-		// }
-
+		log.Println("[ACCESS] ", r)
 		reqString, _ := httputil.DumpRequest(r, true)
-		log.Println("[requestLoggingMiddleware] ", r, reqString)
+		log.Println("[ACCESS] ", r, reqString)
 
 		next.ServeHTTP(w, r)
 	})

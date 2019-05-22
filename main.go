@@ -9,25 +9,30 @@ import (
 	"os/signal"
 	"time"
 
-	"gophersises/02_url_shortener/handlers"
-	"gophersises/02_url_shortener/storage"
-
 	"github.com/gorilla/mux"
 	"github.com/kelseyhightower/envconfig"
+
+	"github.com/sokks/url-short/handlers"
+	"github.com/sokks/url-short/storage"
 )
 
 type config struct {
-	LogLevel string `default:"DEBUG"`
+	LogLevel   string `default:"DEBUG"`
+	LogFile    string `default:""`
+	LogFullReq bool   `default:"false"`
 
 	Port          int           `required:"true"`
 	GracefullWait time.Duration `default:"15s"`
 
 	UseDB bool `default:"true"`
 
-	RedisAddr      string        `default:"localhost:6379"`
+	RedisAddr      string        `default:""`
 	RedisPassword  string        `default:""`
 	RedisDB        int           `default:"0"`
 	RedisRWTimeout time.Duration `default:"5s"`
+
+	BaseURL        string `default:""`
+	MaxRehashTries int    `default:"5"`
 }
 
 func main() {
@@ -36,15 +41,26 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	log.Printf("CONFIG: %+v", c)
+
+	if (c.LogFile != "") {
+		f, err := os.OpenFile(c.LogFile, os.O_RDWR | os.O_CREATE | os.O_APPEND, 0666)
+		if err != nil {
+			log.Fatalf("error opening file: %v", err)
+		}
+		defer f.Close()
+		log.SetOutput(f)
+	}
+
+	fmt.Println("started at ", time.Now())
 
 	err = storage.Init(c.UseDB, c.RedisAddr, c.RedisPassword, c.RedisDB, c.RedisRWTimeout)
 	if err != nil {
 		log.Fatal(err)
 	}
+	handlers.Init(c.BaseURL, c.MaxRehashTries)
 
-	router := newRouter()
+	router := newRouter(c.LogFullReq)
 	srv := &http.Server{
 		Addr:         fmt.Sprintf(`:%d`, c.Port),
 		WriteTimeout: time.Second * 15,
@@ -57,6 +73,7 @@ func main() {
 		if err := srv.ListenAndServe(); err != nil {
 			log.Fatal(err)
 		}
+		log.Println("started at ", time.Now())
 	}()
 
 	// graceful shutdown
@@ -72,17 +89,16 @@ func main() {
 	os.Exit(0)
 }
 
-func newRouter() *mux.Router {
+func newRouter(useRequestLoggingMiddlware bool) *mux.Router {
 	r := mux.NewRouter() //.StrictSlash(true)
 
-	r.HandleFunc("/new", handlers.NewHandler).Methods("GET", "POST")
+	r.HandleFunc("/new", handlers.NewHandler).Methods("POST")
 	r.HandleFunc("/{hash}", handlers.IndexHandler).Methods("GET")
 
-	fs := http.FileServer(http.Dir("static"))
-	r.Handle("/static/", http.StripPrefix("/static/", fs))
-
 	r.Use(handlers.PanicMiddleware)
-	r.Use(handlers.RequestLoggingMiddleware)
+	if (useRequestLoggingMiddlware) {
+		r.Use(handlers.RequestLoggingMiddleware)
+	}
 
 	return r
 }
