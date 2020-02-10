@@ -4,16 +4,17 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strings"
+
+	"github.com/gorilla/mux"
 
 	"github.com/sokks/url-short/hasher"
 	"github.com/sokks/url-short/storage"
-
-	"github.com/gorilla/mux"
 )
 
 var (
 	maxRetries = 2
-	baseURL = ""
+	baseURL    = ""
 )
 
 func Init(newBaseURL string, maxRehash int) {
@@ -25,11 +26,11 @@ func Init(newBaseURL string, maxRehash int) {
 func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	hash := vars["hash"]
-	log.Printf("CHEKING HASH: %s", hash)
+	log.Printf("[REQUEST] get hash=%s", hash)
 
 	fullURL, err := storage.Get(hash)
 	if err == storage.ErrKeyNotFound {
-		w.WriteHeader(http.StatusNotFound) // todo html page
+		w.WriteHeader(http.StatusNotFound)
 		return
 	} else if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -48,9 +49,13 @@ type NewResponse struct {
 func NewHandler(w http.ResponseWriter, r *http.Request) {
 	longurl := r.FormValue("url")
 	log.Printf("[REQUEST] /new url=%s", longurl)
+	longurl = strings.Trim(longurl, " ")
 	if longurl == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		return
+	}
+	if !strings.HasPrefix(longurl, "http://") && !strings.HasPrefix(longurl, "https://") {
+		longurl = "http://" + longurl
 	}
 
 	hash := hasher.HashURL(longurl, 0)
@@ -63,11 +68,11 @@ func NewHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		if err == storage.ErrKeyAlreadyExists {
 			var existingURL string
-			existingURL, err = storage.Get(hash)  // лок же не нужен?
+			existingURL, err = storage.Get(hash)
 			if err == nil && existingURL == longurl {
 				break
 			}
-			
+
 			log.Printf("[COLLISION] url=%s hash=%s", longurl, hash)
 			hash = hasher.HashURL(longurl, uint64(i+1))
 		} else {
@@ -82,7 +87,7 @@ func NewHandler(w http.ResponseWriter, r *http.Request) {
 
 	resp := NewResponse{
 		Long:  longurl,
-		Short: baseURL+hash,
+		Short: baseURL + hash,
 	}
 	data, err := json.Marshal(resp)
 	if err != nil {
@@ -91,4 +96,3 @@ func NewHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Write(data)
 }
-

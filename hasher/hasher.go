@@ -3,7 +3,6 @@ package hasher
 import (
 	"crypto/sha1"
 	"strconv"
-	"sync"
 
 	"github.com/lytics/base62"
 )

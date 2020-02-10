@@ -10,7 +10,7 @@ FROM alpine:3.7
 WORKDIR /root
 
 COPY --from=builder /go/src/github.com/sokks/url-short/urlshort .
-COPY --from=builder /go/src/github.com/sokks/url-short/wait-for-redis.sh .
+#COPY --from=builder /go/src/github.com/sokks/url-short/wait-for-redis.sh .
 
 EXPOSE 12321
 ENTRYPOINT [ "./urlshort" ]

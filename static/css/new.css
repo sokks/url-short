@@ -69,7 +69,7 @@ form > textarea {
 }
 
 form > button {
-    background-color: #FA7268;
+    background-color: #BB4A4D;
     border: none;
     color: white;
     padding: 12px 20px;
@@ -80,6 +80,23 @@ form > button {
     font-size: 1rem;
 }
 
+#result-id {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#result-id > button {
+    text-decoration: none;
+    height: 20px;
+}
+
 .hidden {
     display: none;
+}
+
+.transparent {
+    opacity: 0;
 }

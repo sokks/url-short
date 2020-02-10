@@ -2,10 +2,10 @@ default:
 	echo hello
 
 prepare_static:
-	cp -r static/html/* /var/www/exler.xyz/html/
-	cp -r static/css/* /var/www/exler.xyz/css/
-	cp -r static/js/* /var/www/exler.xyz/js/
-	cp -r static/img/* /var/www/exler.xyz/img/
+	cp -r static/html/* /var/www/urls.exler.xyz/html/
+	cp -r static/css/* /var/www/urls.exler.xyz/css/
+	cp -r static/js/* /var/www/urls.exler.xyz/js/
+	cp -r static/img/* /var/www/urls.exler.xyz/img/
 
 build_app:
 	docker build -t urlshort .
@@ -24,7 +24,7 @@ run_app:
 
 run_redis:
 	docker stop some-redis || true && docker container rm some-redis || true
-	docker run -p 6379:6379 -v redis_vol:/data --name some-redis -d redis 
+	docker run -p 127.0.0.1:6379:6379 -v redis_vol:/data --name some-redis -d redis 
 	# -v /usr/local/etc/redis.conf:/usr/local/etc/redis/redis.conf
 
 create_volume:
@@ -35,7 +35,7 @@ create_volume:
       redis_vol
 
 connect_to_redis:
-	sudo docker run -it --name my-redis-cli --link some-redis:redis --rm redis redis-cli -h redis -p 6379
+	sudo docker run -it --name my-redis-cli --net=host --rm redis redis-cli -h 127.0.0.1 -p 6379
 
 create_vol_dirs:
 	# mkdir -p /var/log/urlshort

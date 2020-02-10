@@ -21,11 +21,10 @@ func Init(useDB bool, addr string, pwd string, db int, rwTimeout time.Duration) 
 	var err error
 
 	if useDB {
-		ss, err := NewDBStorage(addr, pwd, db, rwTimeout)
+		s, err = NewDBStorage(addr, pwd, db, rwTimeout)
 		if err != nil {
 			return err
 		}
-		s = *ss
 	} else {
 		s, err = NewInmemoryStorage()
 		if err != nil {
