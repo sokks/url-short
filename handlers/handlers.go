@@ -94,5 +94,8 @@ func NewHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	w.Write(data)
+	_, err = w.Write(data)
+	if err != nil {
+		log.Printf("[WARN] Failed to write response with error: %s", err)
+	}
 }

@@ -2,6 +2,7 @@ package storage
 
 import (
 	"fmt"
+	"log"
 	"time"
 )
 
@@ -32,7 +33,10 @@ func Init(useDB bool, addr string, pwd string, db int, rwTimeout time.Duration) 
 		}
 	}
 
-	s.Put("testhash", "full-url/for-testing-this")
+	err = s.Put("testhash", "full-url/for-testing-this")
+	if err != nil {
+		log.Printf("[WARN] Error on putting testhash: %v", err)
+	}
 	return nil
 }
 
