@@ -21,7 +21,7 @@ linters:
     - gofmt
     - goimports
     - golint
-    - gomnd
+    #- gomnd
     - goprintffuncname
     - gosec
     - gosimple
@@ -42,10 +42,10 @@ linters:
     - unused
     - varcheck
     - whitespace
-    - gochecknoglobals
+    #- gochecknoglobals
     - gocognit
-    - godox
-    - maligned
+    #- godox
+    #- maligned
     - prealloc
 disable-all: true
   
