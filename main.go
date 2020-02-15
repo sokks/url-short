@@ -21,12 +21,12 @@ type config struct {
 	LogFile    string `default:""`
 	LogFullReq bool   `default:"false"`
 
-	Port          int           `required:"true"`
+	Port          int           `default:"12321"`
 	GracefullWait time.Duration `default:"15s"`
 
 	UseDB bool `default:"true"`
 
-	RedisAddr      string        `default:""`
+	RedisAddr      string        `default:"redis:6379"`
 	RedisPassword  string        `default:""`
 	RedisDB        int           `default:"0"`
 	RedisRWTimeout time.Duration `default:"5s"`
@@ -52,7 +52,7 @@ func main() {
 		log.SetOutput(f)
 	}
 
-	fmt.Println("started at ", time.Now())
+	log.Printf("started at %s", time.Now())
 
 	err = storage.Init(c.UseDB, c.RedisAddr, c.RedisPassword, c.RedisDB, c.RedisRWTimeout)
 	if err != nil {
@@ -73,7 +73,7 @@ func main() {
 		if err := srv.ListenAndServe(); err != nil {
 			log.Fatal(err)
 		}
-		log.Println("started at ", time.Now())
+		log.Printf("stopped at %s", time.Now())
 	}()
 
 	// graceful shutdown
