@@ -43,8 +43,8 @@ func main() {
 	}
 	log.Printf("CONFIG: %+v", c)
 
-	if (c.LogFile != "") {
-		f, err := os.OpenFile(c.LogFile, os.O_RDWR | os.O_CREATE | os.O_APPEND, 0666)
+	if c.LogFile != "" {
+		f, err := os.OpenFile(c.LogFile, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 		if err != nil {
 			log.Fatalf("error opening file: %v", err)
 		}
@@ -84,7 +84,11 @@ func main() {
 
 	ctx, cancel := context.WithTimeout(context.Background(), c.GracefullWait)
 	defer cancel()
-	srv.Shutdown(ctx)
+	err = srv.Shutdown(ctx)
+	if err != nil {
+		log.Printf("[ERROR] Failed to shutdown properly, err: %s", err)
+		os.Exit(1)
+	}
 	log.Printf("grasefully shutted down")
 	os.Exit(0)
 }
@@ -96,7 +100,7 @@ func newRouter(useRequestLoggingMiddlware bool) *mux.Router {
 	r.HandleFunc("/{hash}", handlers.IndexHandler).Methods("GET")
 
 	r.Use(handlers.PanicMiddleware)
-	if (useRequestLoggingMiddlware) {
+	if useRequestLoggingMiddlware {
 		r.Use(handlers.RequestLoggingMiddleware)
 	}
 
