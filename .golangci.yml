@@ -1,10 +1,10 @@
 run:
-    tests: false
-    timeout: 5m
-    output:
-      format: tab
-    skip-dirs:
-      - vendor
+  tests: false
+  timeout: 5m
+  output:
+    format: tab
+  skip-dirs:
+    - vendor
 linters:
   enable:
     - bodyclose
@@ -48,6 +48,3 @@ linters:
     #- maligned
     - prealloc
 disable-all: true
-  
-  
-  
