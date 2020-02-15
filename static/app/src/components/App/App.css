@@ -1,0 +1,14 @@
+.App {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.margin-5px {
+  margin: 5px !important;
+}
+
+.width100percent {
+  width: 100% !important;
+}

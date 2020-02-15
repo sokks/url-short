@@ -1,0 +1,9 @@
+export const CLEAR_FORM = 'CLEAR_FORM';
+
+export const SET_SHOW_INFO = 'SET_SHOW_INFO';
+
+export const SET_SHOW_LAST_RESULT = 'SET_SHOW_LAST_RESULT';
+export const SET_LAST_RESULT = 'SET_LAST_RESULT';
+
+export const SET_SHOW_RESULT_LIST = 'SET_SHOW_RESULT_LIST';
+export const SET_RESULT_LIST = 'SET_RESULT_LIST';
