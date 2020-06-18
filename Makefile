@@ -7,6 +7,12 @@ prepare_static:
 	cp -r static/js/* /var/www/urls.exler.xyz/js/
 	cp -r static/img/* /var/www/urls.exler.xyz/img/
 
+bin/url-short:
+	go build -o @ .
+
+
+
+
 build_app:
 	docker build -t urlshort .
 

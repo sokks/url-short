@@ -53,18 +53,18 @@
 			});
 
 			function submitForm() {
-				var url = document.getElementById("urlform-id").value
+				let url = document.getElementById("urlform-id").value
 				sendNewRequest(url, processResponse);
 			}
 
 			function sendNewRequest(url, callback) {
-				var resp = null;
+				let resp = null;
 
-				var xhr = new XMLHttpRequest();
+				let xhr = new XMLHttpRequest();
 				xhr.responseType = 'json';
-				xhr.open("POST", "https://urls.exler.xyz/s/new", true);
+				xhr.open("POST", "/s/new", true);
 				xhr.setRequestHeader("Content-type","application/x-www-form-urlencoded");
-				var params = "url=" + encodeURIComponent(url);
+				let params = "url=" + encodeURIComponent(url);
 				xhr.onload = function() {
 					if (xhr.status != 200) { 
 						console.log(xhr.status + ': ' + xhr.statusText);
@@ -78,7 +78,7 @@
 				}
 				xhr.onerror = function() {
 					console.log("error!");
-					var explaination = document.createElement("p");
+					let explaination = document.createElement("p");
 					explaination.appendChild(document.createTextNode("Ошибка сети :("));
 					replaceResultHTML(explaination);
 				}
@@ -86,34 +86,34 @@
 			}
 
 			function replaceResultHTML(data) {
-				var divContainer = document.getElementById("result-id");
+				let divContainer = document.getElementById("result-id");
 				divContainer.innerHTML = "";
 				divContainer.appendChild(data);
 			}
 			function appendToResultHTML(data) {
-				var divContainer = document.getElementById("result-id");
+				let divContainer = document.getElementById("result-id");
 				divContainer.appendChild(data);
 			}
 
 			function processResponse(jsonData) {
-				var explaination = document.createElement("p");
+				let explaination = document.createElement("p");
 				explaination.appendChild(document.createTextNode("Ваша короткая ссылка: "));
-				var l = document.createElement("span");
+				let l = document.createElement("span");
 				l.appendChild(document.createTextNode(jsonData.short));
 				l.setAttribute("id", "short-link-span-id");
 				explaination.appendChild(l);
 				explaination.appendChild(document.createElement("br"));
 				replaceResultHTML(explaination);
 
-				var copyButton = document.createElement("button");
+				let copyButton = document.createElement("button");
 				copyButton.appendChild(document.createTextNode("Копировать"));
 				copyButton.onclick = function() {
-					var txt = document.getElementById("short-link-span-id");
-					var temp = document.createElement("input");
+					let txt = document.getElementById("short-link-span-id");
+					let temp = document.createElement("input");
 					temp.setAttribute("type", "text");
 					temp.setAttribute("value", txt.textContent);
 					temp.setAttribute("class", "transparent");
-					var r = document.getElementById("result-id");
+					let r = document.getElementById("result-id");
 					r.appendChild(temp);
 					temp.select();
 					document.execCommand("copy");

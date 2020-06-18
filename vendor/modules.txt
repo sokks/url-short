@@ -1,0 +1,14 @@
+# github.com/go-redis/redis v6.15.1+incompatible
+github.com/go-redis/redis
+github.com/go-redis/redis/internal
+github.com/go-redis/redis/internal/consistenthash
+github.com/go-redis/redis/internal/hashtag
+github.com/go-redis/redis/internal/pool
+github.com/go-redis/redis/internal/proto
+github.com/go-redis/redis/internal/util
+# github.com/gorilla/mux v1.7.0
+github.com/gorilla/mux
+# github.com/kelseyhightower/envconfig v1.3.0
+github.com/kelseyhightower/envconfig
+# github.com/lytics/base62 v0.0.0-20180808010106-0ee4de5a5d6d
+github.com/lytics/base62

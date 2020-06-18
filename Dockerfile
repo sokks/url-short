@@ -7,10 +7,10 @@ ENV \
     GOOS=linux \
     GOARCH=amd64
 
-ENV SRC_DIR=/go/src/github.com/sokks/url-short
+ENV SRC_DIR=/home/url-short
 ADD . $SRC_DIR
 WORKDIR $SRC_DIR
-RUN go build -o urlshort
+RUN go build -mod=vendor -o urlshort
 RUN \
     if [ -z "$SKIP_LINTERS" ] ; then \
     golangci-lint run -v ./... ; \
@@ -20,7 +20,7 @@ FROM alpine:3.11
 
 WORKDIR /root
 
-COPY --from=builder /go/src/github.com/sokks/url-short/urlshort .
+COPY --from=builder /home/url-short/urlshort .
 #COPY --from=builder /go/src/github.com/sokks/url-short/wait-for-redis.sh .
 
 EXPOSE 12321

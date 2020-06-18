@@ -16,7 +16,7 @@ The app is configured with environment variables described below. With docker th
 | URLSHORT_REDISPASSWORD  | ""         |                               |
 | URLSHORT_REDISDB        | 0          |                               |
 | URLSHORT_REDISRWTIMEOUT | 5s         |                               |
-| URLSHORT_BASEURL        | ""         | Base url before hash `FIXME`  |
+| URLSHORT_BASEURL        | ""         | Base url before hash          |
 | URLSHORT_MAXREHASHTRIES | 5          |                               |
 
 
